@@ -26,7 +26,7 @@ EXPOSE 3000
 CMD ["npm", "start"]
 
 FROM development as dev-envs
-RUN apt-get update \
+RUN apt-get update && \
 apt-get install -y --no-install-recommends git
 
 RUN useradd -s /bin/bash -m vscode \
