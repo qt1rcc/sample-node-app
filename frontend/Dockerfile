@@ -26,16 +26,13 @@ EXPOSE 3000
 CMD ["npm", "start"]
 
 FROM development as dev-envs
-RUN <<EOF
-apt update
-apt install -y --no-install-recommends git
-EOF
+RUN apt-get update \
+apt-get install -y --no-install-recommends git
 
-RUN <<EOF
-useradd -s /bin/bash -m vscode
-groupadd docker
+RUN useradd -s /bin/bash -m vscode \
+groupadd docker \
 usermod -aG docker vscode
-EOF
+
 # install Docker tools (cli, buildx, compose)
 COPY --from=gloursdocker/docker / /
 CMD [ "npm", "start" ]
