@@ -27,7 +27,7 @@
   "eslintConfig": {
     "extends": "react-app"
   },
-  "proxy": "http://sample-node-chart-backend:3000",
+  "proxy": "http://sample-node-app-back.steeple-lcl.com",
   "browserslist": {
     "production": [
       ">0.2%",
