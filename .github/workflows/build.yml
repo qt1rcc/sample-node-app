@@ -26,10 +26,14 @@ jobs:
               username: ${{github.actor}}
               password: ${{secrets.GITHUB_TOKEN}}
 
+          - name: Set outputs
+            id: vars
+            run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
           - name: 'Build Inventory Image'
             run: |
-              docker build . --tag ghcr.io/qt1rcc/sample-node-app-front:${GIT_HASH}
-              docker push ghcr.io/qt1rcc/sample-node-app-front:${GIT_HASH}
+              docker build . --tag ghcr.io/qt1rcc/sample-node-app-front:${{ steps.vars.outputs.sha_short }}
+              docker push ghcr.io/qt1rcc/sample-node-app-front:${{ steps.vars.outputs.sha_short }}
 
       push-backend-image:
         runs-on: ubuntu-latest
@@ -49,5 +53,5 @@ jobs:
 
           - name: 'Build Inventory Image'
             run: |
-              docker build . --tag ghcr.io/qt1rcc/sample-node-app-back:${GIT_HASH}
-              docker push ghcr.io/qt1rcc/sample-node-app-back:${GIT_HASH}
+              docker build . --tag ghcr.io/qt1rcc/sample-node-app-back:${{ steps.vars.outputs.sha_short }}
+              docker push ghcr.io/qt1rcc/sample-node-app-back:${{ steps.vars.outputs.sha_short }}
