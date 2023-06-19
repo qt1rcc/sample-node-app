@@ -28,8 +28,8 @@ jobs:
 
           - name: 'Build Inventory Image'
             run: |
-              docker build . --tag ghcr.io/Qt1RCC/sample-node-app-front:$GIT_HASH
-              docker push ghcr.io/Qt1RCC/sample-node-app-front:$GIT_HASH
+              docker build . --tag ghcr.io/qt1rcc/sample-node-app-front:$GIT_HASH
+              docker push ghcr.io/qt1rcc/sample-node-app-front:$GIT_HASH
 
       push-backend-image:
         runs-on: ubuntu-latest
@@ -49,5 +49,5 @@ jobs:
 
           - name: 'Build Inventory Image'
             run: |
-              docker build . --tag ghcr.io/Qt1RCC/sample-node-app-back:$GIT_HASH
-              docker push ghcr.io/Qt1RCC/sample-node-app-back:$GIT_HASH
+              docker build . --tag ghcr.io/qt1rcc/sample-node-app-back:$GIT_HASH
+              docker push ghcr.io/qt1rcc/sample-node-app-back:$GIT_HASH
