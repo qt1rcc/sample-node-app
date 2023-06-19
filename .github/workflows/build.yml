@@ -51,6 +51,10 @@ jobs:
               username: ${{github.actor}}
               password: ${{secrets.GITHUB_TOKEN}}
 
+          - name: Set outputs
+            id: vars
+            run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
           - name: 'Build Inventory Image'
             run: |
               docker build . --tag ghcr.io/qt1rcc/sample-node-app-back:${{ steps.vars.outputs.sha_short }}
