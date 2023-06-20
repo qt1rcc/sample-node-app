@@ -14,6 +14,7 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
+    axios.defaults.baseURL = process.env.REACT_APP_API_ENDPOINT;
     axios
       .get("/api")
       .then((response) => {
@@ -25,6 +26,7 @@ export default class App extends React.Component {
   }
 
   handleAddTodo = (value) => {
+    axios.defaults.baseURL = process.env.REACT_APP_API_ENDPOINT;
     axios
       .post("/api/todos", { text: value })
       .then(() => {
