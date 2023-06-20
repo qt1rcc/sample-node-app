@@ -6,6 +6,8 @@ import * as serviceWorker from './serviceWorker';
 
 import './custom.scss';
 
+axios.defaults.baseURL = process.env.VUE_APP_API_ENDPOINT;
+
 ReactDOM.render(<App />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
