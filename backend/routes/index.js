@@ -33,6 +33,6 @@ const routes = (app) => {
 
   //it's a prefix before api it is useful when you have many modules and you want to
   //differentiate b/w each module you can use this technique
-  app.use("http://sample-node-app-back.steeple-lcl.com/api", router);
+  app.use("api", router);
 };
 module.exports = routes;
