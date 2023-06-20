@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1.4
-
 # Create image based on the official Node image from dockerhub
 FROM node:lts-buster AS development
 
@@ -14,25 +12,17 @@ COPY package-lock.json /usr/src/app
 #RUN npm set progress=false \
 #    && npm config set depth 0 \
 #    && npm i install
-RUN npm ci
+RUN npm ci --silent
+
+RUN npm install --silent
 
 # Get all the code needed to run the app
 COPY . /usr/src/app
 
-# Expose the port the app runs in
-EXPOSE 3000
+RUN npm run build
 
-# Serve the app
-CMD ["npm", "start"]
-
-FROM development as dev-envs
-RUN apt-get update && \
-apt-get install -y --no-install-recommends git
-
-RUN useradd -s /bin/bash -m vscode && \
-groupadd docker && \
-usermod -aG docker vscode
-
-# install Docker tools (cli, buildx, compose)
-COPY --from=gloursdocker/docker / /
-CMD [ "npm", "start" ]
+# production environment
+FROM nginx:stable-alpine
+COPY --from=development /usr/src/app /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
