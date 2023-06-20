@@ -1,5 +1,5 @@
 # Create image based on the official Node image from dockerhub
-FROM node:hydrogen AS development
+FROM node:lts-buster AS development
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -12,8 +12,6 @@ COPY package-lock.json /usr/src/app
 #RUN npm set progress=false \
 #    && npm config set depth 0 \
 #    && npm i install
-RUN npm install
-
 RUN npm ci
 
 # Get all the code needed to run the app
