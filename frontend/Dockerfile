@@ -1,5 +1,5 @@
 # Create image based on the official Node image from dockerhub
-FROM node:hydrogen-alpine AS development
+FROM node:hydrogen AS development
 
 # Create app directory
 WORKDIR /usr/src/app

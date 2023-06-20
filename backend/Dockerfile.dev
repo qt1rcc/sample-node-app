@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM node:hydrogen-alpine AS development
+FROM node:hydrogen AS development
 
 # Create app directory
 WORKDIR /usr/src/app
