@@ -54,10 +54,6 @@ jobs:
               username: ${{github.actor}}
               password: ${{secrets.GITHUB_TOKEN}}
 
-          - name: Set outputs
-            id: vars
-            run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-
           - name: Semantic Release
             uses: cycjimmy/semantic-release-action@v3
             id: semantic
