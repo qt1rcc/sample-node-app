@@ -28,16 +28,12 @@ jobs:
 
           - name: Semantic Release
             uses: cycjimmy/semantic-release-action@v3
+            id: semantic
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-
-          - name: Set outputs
-            id: vars
-            run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-
-          - name: 'Build Inventory Image'
+          - name: 'Build Frontend Image'
             run: |
               docker build . --tag ghcr.io/qt1rcc/sample-node-app-front:${{ steps.semantic.outputs.new_release_version }}
               docker push ghcr.io/qt1rcc/sample-node-app-front:${{ steps.semantic.outputs.new_release_version }}
@@ -62,7 +58,7 @@ jobs:
             id: vars
             run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
-          - name: 'Build Inventory Image'
+          - name: 'Build Backend Image'
             run: |
               docker build . --tag ghcr.io/qt1rcc/sample-node-app-back:${{ steps.semantic.outputs.new_release_version }}
               docker push ghcr.io/qt1rcc/sample-node-app-back:${{ steps.semantic.outputs.new_release_version }}
