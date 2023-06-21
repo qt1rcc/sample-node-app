@@ -39,6 +39,7 @@ jobs:
               docker push ghcr.io/qt1rcc/sample-node-app-front:${{ steps.semantic.outputs.new_release_version }}
 
       push-backend-image:
+        needs: push-frontend-image
         runs-on: ubuntu-latest
         defaults:
           run:
@@ -63,5 +64,5 @@ jobs:
 
           - name: 'Build Backend Image'
             run: |
-              docker build . --tag ghcr.io/qt1rcc/sample-node-app-back:${{ steps.semantic.outputs.new_release_version }}
-              docker push ghcr.io/qt1rcc/sample-node-app-back:${{ steps.semantic.outputs.new_release_version }}
+              docker build . --tag ghcr.io/qt1rcc/sample-node-app-back:${{ steps.semantic.outputs.last_release_version }}
+              docker push ghcr.io/qt1rcc/sample-node-app-back:${{ steps.semantic.outputs.last_release_version }}
