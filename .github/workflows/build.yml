@@ -83,11 +83,21 @@ jobs:
             env:
               GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-          - name: Invoke workflow in another repo with inputs
+          - name: Invoke workflow in another repo with inputs for frontend
             uses: benc-uk/workflow-dispatch@v1
             with:
               workflow: manifest_update.yml
               token: ${{ secrets.GH_TOKEN }}
               repo: qt1rcc/helm-charts
               ref: ${{ github.event.pull_request.head.ref }}
-              inputs: '{"ref": "version-${{ steps.semantic_release_info.outputs.version }}", "version": "${{ steps.semantic_release_info.outputs.version }}", "appName": "sample-node-app"}'
+              inputs: '{"ref": "version-${{ steps.semantic_release_info.outputs.version }}", "version": "${{ steps.semantic_release_info.outputs.version }}", "appName": "sample_node_app_frontend"}'
+              
+              
+          - name: Invoke workflow in another repo with inputs for backend
+            uses: benc-uk/workflow-dispatch@v1
+            with:
+              workflow: manifest_update.yml
+              token: ${{ secrets.GH_TOKEN }}
+              repo: qt1rcc/helm-charts
+              ref: ${{ github.event.pull_request.head.ref }}
+              inputs: '{"ref": "version-${{ steps.semantic_release_info.outputs.version }}", "version": "${{ steps.semantic_release_info.outputs.version }}", "appName": "sample_node_app_backend"}'
