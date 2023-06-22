@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 env:
   GIT_HASH: $(git rev-parse --short "$GITHUB_SHA")
@@ -91,4 +90,4 @@ jobs:
               token: ${{ secrets.GITHUB_TOKEN }}
               repository: qt1rcc/helm-charts
               event-type: new-app-version
-              client-payload: '{"ref": "${{ github.ref }}", "version": "${{ steps.semantic_release_info.outputs.version }}"}'
+              client-payload: '{"ref": "version-${{ steps.semantic_release_info.outputs.version }}", "version": "${{ steps.semantic_release_info.outputs.version }}"}'
