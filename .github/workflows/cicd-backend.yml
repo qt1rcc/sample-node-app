@@ -17,46 +17,54 @@ jobs:
           - name: 'Checkout GitHub Action'
             uses: actions/checkout@main
 
+          - name: Bump version and push tag
+            id: version_bump
+            uses: anothrNick/github-tag-action@1.61.0
+            env:
+              GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+              DEFAULT_BRANCH: main
+              DEFAULT_BUMP: patch
+              WITH_V: true
+
+          - name: Set up QEMU
+            if: steps.version_bump.outputs.new_tag != steps.version_bump.outputs.old_tag
+            uses: docker/setup-qemu-action@v2
+
+          - name: Set up Docker Buildx
+            if: steps.version_bump.outputs.new_tag != steps.version_bump.outputs.old_tag
+            uses: docker/setup-buildx-action@v2
+
           - name: 'Login to GitHub Container Registry'
-            uses: docker/login-action@v1
+            if: steps.version_bump.outputs.new_tag != steps.version_bump.outputs.old_tag
+            uses: docker/login-action@v2
             with:
               registry: ghcr.io
               username: ${{github.actor}}
               password: ${{secrets.GITHUB_TOKEN}}
 
-          - name: Gets semantic release info
-            id: semantic_release_info
-            uses: jossef/action-semantic-release-info@v2.1.0
-            env:
-              GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          - name: Extract metadata for the Docker image
+            if: steps.version_bump.outputs.new_tag != steps.version_bump.outputs.old_tag
+            id: meta
+            uses: docker/metadata-action@v4
+            with:
+              images: ghcr.io/qt1rcc/sample-node-app-back
+              tags: |
+                type=semver,pattern={{version}},value=${{ steps.version_bump.outputs.new_tag }}
 
-          - name: 'Build Backend Image'
-            run: |
-              docker build . --tag ghcr.io/qt1rcc/sample-node-app-back:${{ steps.semantic_release_info.outputs.version }}
-              
-          - name: 'Push Backend Image'
-            run: |
-              docker push ghcr.io/qt1rcc/sample-node-app-back:${{ steps.semantic_release_info.outputs.version }}
-              
-      Trigger_chart_update:
-        needs: [CI-Backend]
-        runs-on: ubuntu-latest
-        permissions: write-all
-        steps:
-          - name: 'Checkout GitHub Action'
-            uses: actions/checkout@main
-            
-          - name: Gets semantic release info
-            id: semantic_release_info
-            uses: jossef/action-semantic-release-info@v2.1.0
-            env:
-              GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          - name: Build and push
+            if: steps.version_bump.outputs.new_tag != steps.version_bump.outputs.old_tag
+            uses: docker/build-push-action@v3
+            with:
+              context: backend
+              push: true
+              tags: ${{ steps.meta.outputs.tags }}
 
           - name: Invoke workflow in another repo with inputs for backend
+            if: steps.version_bump.outputs.new_tag != steps.version_bump.outputs.old_tag
             uses: benc-uk/workflow-dispatch@v1
             with:
               workflow: manifest_update.yml
               token: ${{ secrets.GH_TOKEN }}
               repo: qt1rcc/helm-charts
               ref: ${{ github.event.pull_request.head.ref }}
-              inputs: '{"ref": "sample_node_app_backend-${{ steps.semantic_release_info.outputs.version }}", "version": "${{ steps.semantic_release_info.outputs.version }}", "appName": "sample_node_app", "appComponent": "backend"}'
+              inputs: '{"ref": "sample_node_app_backend-${{ env.DOCKER_METADATA_OUTPUT_VERSION }}", "version": "${{ env.DOCKER_METADATA_OUTPUT_VERSION }}", "appName": "sample_node_app", "appComponent": "backend"}'
