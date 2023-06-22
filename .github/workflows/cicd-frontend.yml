@@ -1,4 +1,4 @@
-name: [Build & Deploy] Sample Node APP - Frontend image to GHCR
+name: "[Build & Deploy] Sample Node APP - Frontend image to GHCR"
 
 on:
   push:
