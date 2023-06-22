@@ -41,3 +41,12 @@ jobs:
             run: |
               docker build . --tag ghcr.io/qt1rcc/sample-node-app-back:${{ steps.semantic.outputs.new_release_version }}
               docker push ghcr.io/qt1rcc/sample-node-app-back:${{ steps.semantic.outputs.new_release_version }}
+              
+              
+          - name: Repository Dispatch
+            uses: peter-evans/repository-dispatch@v2
+            with:
+              token: ${{ secrets.GITHUB_TOKEN }}
+              repository: qt1rcc/helm-charts
+              event-type: new-docker-version
+              client-payload: '{"ref": "${{ github.ref }}", "version": "${{ steps.semantic.outputs.new_release_version }}"}'
