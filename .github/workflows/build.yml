@@ -71,13 +71,18 @@ jobs:
               docker push ghcr.io/qt1rcc/sample-node-app-back:${{ steps.semantic_release_info.outputs.version }}
               
       Trigger_chart_update:
+        needs: [CI-Frontend, CI-Backend]
         runs-on: ubuntu-latest
         steps:
+          - name: 'Checkout GitHub Action'
+            uses: actions/checkout@main
+            
           - name: Gets semantic release info
             id: semantic_release_info
             uses: jossef/action-semantic-release-info@v2.1.0
             env:
               GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+              
           - name: Repository Dispatch
             uses: peter-evans/repository-dispatch@v2
             with:
