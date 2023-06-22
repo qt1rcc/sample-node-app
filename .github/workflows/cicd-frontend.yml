@@ -26,7 +26,7 @@ jobs:
           - name: 'Login to GitHub Container Registry'
             uses: docker/login-action@v2
             with:
-              registry: ghcr.io/qt1rcc
+              registry: ghcr.io
               username: ${{github.actor}}
               password: ${{secrets.GITHUB_TOKEN}}
 
@@ -34,7 +34,7 @@ jobs:
             id: meta
             uses: docker/metadata-action@v4
             with:
-              images: ghcr.io/sample-node-app-front
+              images: ghcr.io/qt1rcc/sample-node-app-front
               tags: |
                 # minimal
                 type=semver,pattern={{version}}
