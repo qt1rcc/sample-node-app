@@ -43,6 +43,7 @@ jobs:
             uses: docker/build-push-action@v4
             with:
               context: frontend
+              push: true
               tags: ${{ steps.meta.outputs.tags }}
 
           - name: Invoke workflow in another repo with inputs for frontend
