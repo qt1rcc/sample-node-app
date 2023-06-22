@@ -1,0 +1,84 @@
+name: [Build & Deploy] Sample Node APP - Frontend image to GHCR
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - frontend/**
+
+jobs:
+      CI-Frontend:
+        runs-on: ubuntu-latest
+        defaults:
+          run:
+            working-directory: './frontend'
+        steps:
+          - name: 'Checkout GitHub Action'
+            uses: actions/checkout@main
+
+          - name: 'Login to GitHub Container Registry'
+            uses: docker/login-action@v1
+            with:
+              registry: ghcr.io
+              username: ${{github.actor}}
+              password: ${{secrets.GITHUB_TOKEN}}
+
+          - name: Gets semantic release info
+            id: semantic_release_info
+            uses: jossef/action-semantic-release-info@v2.1.0
+            env:
+              GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+          - name: 'Build Frontend Image'
+            run: |
+              docker build . --tag ghcr.io/qt1rcc/sample-node-app-front:${{ steps.semantic_release_info.outputs.version }}
+              
+          - name: 'Push Frontend Image'
+            run: |
+              docker push ghcr.io/qt1rcc/sample-node-app-front:${{ steps.semantic_release_info.outputs.version }}
+              
+      CI-Backend:
+        runs-on: ubuntu-latest
+        defaults:
+          run:
+            working-directory: './backend'
+        steps:
+          - name: 'Checkout GitHub Action'
+            uses: actions/checkout@main
+
+          - name: 'Login to GitHub Container Registry'
+            uses: docker/login-action@v1
+            with:
+              registry: ghcr.io
+              username: ${{github.actor}}
+              password: ${{secrets.GITHUB_TOKEN}}
+
+          - name: Gets semantic release info
+            id: semantic_release_info
+            uses: jossef/action-semantic-release-info@v2.1.0
+            env:
+              GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+              
+      Trigger_chart_update:
+        needs: [CI-Frontend]
+        runs-on: ubuntu-latest
+        permissions: write-all
+        steps:
+          - name: 'Checkout GitHub Action'
+            uses: actions/checkout@main
+            
+          - name: Gets semantic release info
+            id: semantic_release_info
+            uses: jossef/action-semantic-release-info@v2.1.0
+            env:
+              GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+          - name: Invoke workflow in another repo with inputs for frontend
+            uses: benc-uk/workflow-dispatch@v1
+            with:
+              workflow: manifest_update.yml
+              token: ${{ secrets.GH_TOKEN }}
+              repo: qt1rcc/helm-charts
+              ref: ${{ github.event.pull_request.head.ref }}
+              inputs: '{"ref": "sample_node_app_frontend-${{ steps.semantic_release_info.outputs.version }}", "version": "${{ steps.semantic_release_info.outputs.version }}", "appName": "sample_node_app", "appComponent": "frontend"}'
