@@ -73,6 +73,8 @@ jobs:
       Trigger_chart_update:
         needs: [CI-Frontend, CI-Backend]
         runs-on: ubuntu-latest
+        permissions:
+          contents: read
         steps:
           - name: 'Checkout GitHub Action'
             uses: actions/checkout@main
