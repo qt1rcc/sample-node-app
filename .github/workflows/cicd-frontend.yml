@@ -54,4 +54,4 @@ jobs:
               token: ${{ secrets.GH_TOKEN }}
               repo: qt1rcc/helm-charts
               ref: ${{ github.event.pull_request.head.ref }}
-              inputs: '{"ref": "sample_node_app_frontend-${{ steps.meta.outputs.tags }}", "version": "${{ steps.meta.outputs.tags }}", "appName": "sample_node_app", "appComponent": "frontend"}'
+              inputs: '{"ref": "sample_node_app_frontend-${{ env.DOCKER_METADATA_OUTPUT_VERSION }}", "version": "${{ env.DOCKER_METADATA_OUTPUT_VERSION }}", "appName": "sample_node_app", "appComponent": "frontend"}'
