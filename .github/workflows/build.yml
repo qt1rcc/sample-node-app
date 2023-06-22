@@ -1,4 +1,4 @@
-name: Deploy Images to GHCR
+name: Build & Deploy Images to GHCR
 
 on:
   push:
@@ -10,8 +10,11 @@ env:
   GIT_HASH: $(git rev-parse --short "$GITHUB_SHA")
 
 jobs:
-      new-application-version:
+      CI-Frontend:
         runs-on: ubuntu-latest
+        defaults:
+          run:
+            working-directory: './frontend'
         steps:
           - name: 'Checkout GitHub Action'
             uses: actions/checkout@main
@@ -23,30 +26,62 @@ jobs:
               username: ${{github.actor}}
               password: ${{secrets.GITHUB_TOKEN}}
 
-          - name: Semantic Release
-            uses: cycjimmy/semantic-release-action@v3
-            id: semantic
+          - name: Gets semantic release info
+            id: semantic_release_info
+            uses: jossef/action-semantic-release-info@v2.1.0
             env:
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+              GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
           - name: 'Build Frontend Image'
-            working-directory: './frontend'
             run: |
-              docker build . --tag ghcr.io/qt1rcc/sample-node-app-front:${{ steps.semantic.outputs.new_release_version }}
-              docker push ghcr.io/qt1rcc/sample-node-app-front:${{ steps.semantic.outputs.new_release_version }}
+              docker build . --tag ghcr.io/qt1rcc/sample-node-app-front:${{ steps.semantic_release_info.outputs.version }}
+              
+          - name: 'Push Frontend Image'
+            run: |
+              docker push ghcr.io/qt1rcc/sample-node-app-front:${{ steps.semantic_release_info.outputs.version }}
+              
+      CI-Backend:
+        runs-on: ubuntu-latest
+        defaults:
+          run:
+            working-directory: './backend'
+        steps:
+          - name: 'Checkout GitHub Action'
+            uses: actions/checkout@main
+
+          - name: 'Login to GitHub Container Registry'
+            uses: docker/login-action@v1
+            with:
+              registry: ghcr.io
+              username: ${{github.actor}}
+              password: ${{secrets.GITHUB_TOKEN}}
+
+          - name: Gets semantic release info
+            id: semantic_release_info
+            uses: jossef/action-semantic-release-info@v2.1.0
+            env:
+              GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
           - name: 'Build Backend Image'
-            working-directory: './backend'
             run: |
-              docker build . --tag ghcr.io/qt1rcc/sample-node-app-back:${{ steps.semantic.outputs.new_release_version }}
-              docker push ghcr.io/qt1rcc/sample-node-app-back:${{ steps.semantic.outputs.new_release_version }}
+              docker build . --tag ghcr.io/qt1rcc/sample-node-app-back:${{ steps.semantic_release_info.outputs.version }}
               
+          - name: 'Push Backend Image'
+            run: |
+              docker push ghcr.io/qt1rcc/sample-node-app-back:${{ steps.semantic_release_info.outputs.version }}
               
+      Trigger_chart_update:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Gets semantic release info
+            id: semantic_release_info
+            uses: jossef/action-semantic-release-info@v2.1.0
+            env:
+              GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           - name: Repository Dispatch
             uses: peter-evans/repository-dispatch@v2
             with:
               token: ${{ secrets.GITHUB_TOKEN }}
               repository: qt1rcc/helm-charts
-              event-type: new-docker-version
-              client-payload: '{"ref": "${{ github.ref }}", "version": "${{ steps.semantic.outputs.new_release_version }}"}'
+              event-type: new-app-version
+              client-payload: '{"ref": "${{ github.ref }}", "version": "${{ steps.semantic_release_info.outputs.version }}"}'
