@@ -49,10 +49,7 @@ jobs:
             with:
               images: ghcr.io/qt1rcc/sample-node-app-front
               tags: |
-                # minimal
-                type=semver,pattern={{version}}
-                # use custom value instead of git tag
-                type=semver,pattern={{version}},value=v1.0.0
+                type=semver,pattern={{version}},value=${{ steps.version_bump.outputs.new_tag }}
 
           - name: Build and push
             if: steps.version_bump.outputs.new_tag != steps.version_bump.outputs.old_tag
