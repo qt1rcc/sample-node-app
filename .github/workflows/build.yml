@@ -84,11 +84,11 @@ jobs:
             uses: jossef/action-semantic-release-info@v2.1.0
             env:
               GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-              
-          - name: Repository Dispatch
-            uses: peter-evans/repository-dispatch@v2
+
+          - name: Invoke workflow in another repo with inputs
+            uses: benc-uk/workflow-dispatch@v1
             with:
+              workflow: manifest_update.yml
               token: ${{ secrets.GITHUB_TOKEN }}
-              repository: qt1rcc/helm-charts
-              event-type: new-app-version
-              client-payload: '{"ref": "version-${{ steps.semantic_release_info.outputs.version }}", "version": "${{ steps.semantic_release_info.outputs.version }}"}'
+              repo: qt1rcc/helm-charts
+              inputs: '{"ref": "version-${{ steps.semantic_release_info.outputs.version }}", "version": "${{ steps.semantic_release_info.outputs.version }}"}'
