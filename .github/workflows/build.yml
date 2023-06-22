@@ -10,7 +10,7 @@ env:
   GIT_HASH: $(git rev-parse --short "$GITHUB_SHA")
 
 jobs:
-      push-frontend-image:
+      new-application-version:
         runs-on: ubuntu-latest
         steps:
           - name: 'Checkout GitHub Action'
