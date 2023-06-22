@@ -44,8 +44,7 @@ jobs:
           - name: Build and push
             uses: docker/build-push-action@v4
             with:
-              context: .
-              file: ./Dockerfile
+              context: frontend
               tags: ${{ steps.meta.outputs.tags }}
 
           - name: Invoke workflow in another repo with inputs for frontend
