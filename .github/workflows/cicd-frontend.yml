@@ -38,8 +38,6 @@ jobs:
               tags: |
                 # minimal
                 type=semver,pattern={{version}}
-                # use custom value instead of git tag
-                type=semver,pattern={{version}},value=v1.0.0
 
           - name: Build and push
             uses: docker/build-push-action@v4
