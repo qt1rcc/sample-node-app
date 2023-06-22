@@ -53,7 +53,7 @@ jobs:
 
           - name: Build and push
             if: steps.version_bump.outputs.new_tag != steps.version_bump.outputs.old_tag
-            uses: docker/build-push-action@v4
+            uses: docker/build-push-action@v3
             with:
               context: frontend
               push: true
