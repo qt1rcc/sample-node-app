@@ -64,7 +64,7 @@ jobs:
               push: true
               tags: ${{ steps.meta.outputs.tags }}
 
-          - name: Invoke workflow in another repo with inputs for ${{ env.COMPONENT_NAME }}
+          - name: Trigger chart update (GitOPS)
             if: steps.version_bump.outputs.new_tag != steps.version_bump.outputs.old_tag
             uses: benc-uk/workflow-dispatch@v1
             with:
