@@ -1,18 +1,23 @@
 name: "[Build & Deploy] Sample Node APP - Frontend image to GHCR"
 
+env:
+  APPLICATION_NAME: 'sample_node_app'
+  COMPONENT_NAME: 'frontend'
+  COMPONENT_IMAGE: 'ghcr.io/qt1rcc/sample-node-app-front'
+
 on:
   push:
     branches:
       - main
     paths:
-      - frontend/**
+      - 'frontend/**'
 
 jobs:
-      CI-Frontend:
+      Continuous-Integration:
         runs-on: ubuntu-latest
         defaults:
           run:
-            working-directory: './frontend'
+            working-directory: '${{ env.COMPONENT_NAME }}'
         steps:
           - name: 'Checkout GitHub Action'
             uses: actions/checkout@main
@@ -47,7 +52,7 @@ jobs:
             id: meta
             uses: docker/metadata-action@v4
             with:
-              images: ghcr.io/qt1rcc/sample-node-app-front
+              images: ${{ env.COMPONENT_IMAGE }}
               tags: |
                 type=semver,pattern={{version}},value=${{ steps.version_bump.outputs.new_tag }}
 
@@ -55,11 +60,11 @@ jobs:
             if: steps.version_bump.outputs.new_tag != steps.version_bump.outputs.old_tag
             uses: docker/build-push-action@v3
             with:
-              context: frontend
+              context: ${{ env.COMPONENT_NAME }}
               push: true
               tags: ${{ steps.meta.outputs.tags }}
 
-          - name: Invoke workflow in another repo with inputs for frontend
+          - name: Invoke workflow in another repo with inputs for ${{ env.COMPONENT_NAME }}
             if: steps.version_bump.outputs.new_tag != steps.version_bump.outputs.old_tag
             uses: benc-uk/workflow-dispatch@v1
             with:
@@ -67,4 +72,4 @@ jobs:
               token: ${{ secrets.GH_TOKEN }}
               repo: qt1rcc/helm-charts
               ref: ${{ github.event.pull_request.head.ref }}
-              inputs: '{"ref": "sample_node_app_frontend-${{ env.DOCKER_METADATA_OUTPUT_VERSION }}", "version": "${{ env.DOCKER_METADATA_OUTPUT_VERSION }}", "appName": "sample_node_app", "appComponent": "frontend"}'
+              inputs: '{"ref": "${{ env.COMPONENT_IMAGE }}-${{ env.DOCKER_METADATA_OUTPUT_VERSION }}", "version": "${{ env.DOCKER_METADATA_OUTPUT_VERSION }}", "appName": "${{ env.APPLICATION_NAME }}", "appComponent": "${{ env.COMPONENT_NAME }}"}'
